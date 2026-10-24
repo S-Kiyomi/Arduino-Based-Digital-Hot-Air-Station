@@ -28,4 +28,4 @@ wet, nanti ajah
 
 MIT License
 
-Copyright (c) [2026] [Shinonome Lab] All Rights Reserved
+Copyright (c) 2026 Rul Chan All Rights Reserved
