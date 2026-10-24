@@ -10,20 +10,15 @@ belum ada, nanti lagi dikerjakan
 
 nanti di jelaskan
 
-## Skematik & Pinout
+## Component Requirements
+
+## Shematics & Pinout
 
 akan di upload secepatnya
 
 ### Cara Kerja Rangkaian
 
 wet, nanti ajah
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
 
