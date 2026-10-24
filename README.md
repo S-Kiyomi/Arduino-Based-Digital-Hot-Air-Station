@@ -23,3 +23,7 @@ wet, nanti ajah
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+MIT License
+
+Copyright (c) [2026] [Shinonome Lab] All Rights Reserved
