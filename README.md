@@ -13,6 +13,8 @@ nanti di jelaskan
 ## Component Requirements
 
 ## Shematics & Pinout
+<img width="1177" height="823" alt="image" src="https://github.com/user-attachments/assets/212dcebb-10e4-4a54-bd77-eb2b1e806831" />
+
 
 akan di upload secepatnya
 
