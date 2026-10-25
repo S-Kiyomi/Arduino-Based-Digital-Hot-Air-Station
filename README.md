@@ -1,11 +1,11 @@
 # Hot-Air Rework Station
 
-Solder uap atau hot air rework station (digital) berbasis Arduino Uno R3 adalah solder uap rakitan/DIY yang bisa dibuat oleh siapa saja
+Solder uap atau hot air rework station (digital) berbasis Arduino Uno R3 adalah solder uap rakitan/DIY yang bisa dibuat oleh siapa saja.
 project ini menggunakan microcontroller arduino uno, sensor Thermocouple Type-K, serta rotary encoder agar lebih mudah mengatur suhu yang diinginkan.
 
 ### WARNING!!
 
-Project ini berhubungan dengan tegangan tinggi, jangan menyentuh area bertegangan tinggi 220v AC.
+Project ini berhubungan dengan tegangan tinggi, jangan menyentuh area bertegangan tinggi 220V AC.
 Resiko tersengat listrik sangat tinggi
 
 ## Fitur
@@ -32,6 +32,6 @@ wet, nanti ajah
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-MIT License
+MIT License >_<
 
 Copyright (c) 2026 Rul Chan All Rights Reserved
