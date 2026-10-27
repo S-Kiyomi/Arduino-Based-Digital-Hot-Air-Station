@@ -69,6 +69,17 @@ void onEncoderButton() {
 }
 
 void refreshLCD() {
+  // ---- display bugfix
+  static bool currentLcdState = true;
+  if (backlightOn != currentLcdState) {
+    if (backlightOn) lcd.backlight();
+    else {
+      lcd.noBacklight();
+      lcd.clear(); // Optional: clear text when the screen is off
+    }
+    currentLcdState = backlightOn;
+  }
+  
   if (!backlightOn) return;
   char line1[17], line2[17];
 
