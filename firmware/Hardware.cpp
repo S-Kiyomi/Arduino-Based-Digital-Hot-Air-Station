@@ -61,8 +61,8 @@ void hardwareInit() {
 
   pinMode(MAX_CS, OUTPUT); digitalWrite(MAX_CS, HIGH);
   pinMode(MAX_SCK, OUTPUT); digitalWrite(MAX_SCK, LOW);
-  // -- init bug fix
-  pinMode(MAX_SO, INPUT_PULLUP);
+  
+  pinMode(MAX_SO, INPUT);
 
   pinMode(ZERO_CROSS_PIN, INPUT_PULLUP);
   pinMode(HANDLE_SWITCH_PIN, INPUT_PULLUP);
