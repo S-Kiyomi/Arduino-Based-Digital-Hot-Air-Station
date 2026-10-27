@@ -49,3 +49,10 @@ The codebase is divided into the following modules to prevent logic tangling:
 * `LiquidCrystal_I2C.h` (External library required for the 16x2 LCD display)
 
 * Note: The MAX6675 is read using direct pin manipulation (bit-banging) to avoid blocking delays present in standard external libraries.
+
+
+## Changelog / Recent Updates
+
+### Bug Fixes & Improvements
+* **Display Power Management (`UI.cpp`)**: Fixed a bug where the LCD backlight would remain on indefinitely. The `refreshLCD()` function now correctly issues hardware-level commands to turn off the I2C LCD backlight after the configured 60-second inactivity timeout.
+* **Failsafe Disconnect Detection (`Hardware.cpp`)**: Improved the MAX6675 thermocouple reading logic. The `MAX_SO` pin now utilizes the internal pull-up resistor (`INPUT_PULLUP`), and a strict `< 5.0°C` threshold was added to `readTemperature()`. This ensures the system immediately enters the **MALFUNCTION** state and cuts off the heater if the 858D handle is completely detached or if the connection lines fail.
