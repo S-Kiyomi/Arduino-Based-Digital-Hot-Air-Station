@@ -12,7 +12,7 @@ const uint8_t ENC_SW            = 3;
 const uint8_t ENC_DT            = 4;
 const uint8_t ENC_CLK           = 5;
 const uint8_t MAX_CS            = 10;
-const uint8_t MAX_SO            = 11;
+const uint8_t MAX_SO            = 12; // fix mismatch pin
 const uint8_t MAX_SCK           = 13;
 const uint8_t ZERO_CROSS_PIN    = 2;
 

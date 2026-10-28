@@ -75,7 +75,7 @@ void refreshLCD() {
     if (backlightOn) lcd.backlight();
     else {
       lcd.noBacklight();
-      lcd.clear(); // Optional: clear text when the screen is off
+      // lcd.clear(); // Optional: clear text when the screen is off
     }
     currentLcdState = backlightOn;
   }
