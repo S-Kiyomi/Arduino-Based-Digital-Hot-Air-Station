@@ -32,9 +32,6 @@ Untuk merakit stasiun solder uap ini, Anda membutuhkan komponen berikut:
 
 ---
 
-## Schematics & Pinout
-
-Berikut adalah pemetaan pin (*pinout*) berdasarkan konfigurasi *firmware* bawaan:
 
 | Komponen | Pin / Koneksi ke Arduino | Keterangan |
 | :--- | :--- | :--- |
