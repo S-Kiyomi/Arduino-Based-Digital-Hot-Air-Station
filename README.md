@@ -22,9 +22,17 @@ nanti di jelaskan
 
 akan di upload secepatnya
 
-### Cara Kerja Rangkaian
+### Cara Kerja Rangkaian (singkat)
 
-wet, nanti ajah
+----
+
+## Cara Upload Code ke Arduino Uno
+
+----
+
+## Cara Penggunaan
+
+----
 
 ## License
 
