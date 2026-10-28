@@ -105,22 +105,25 @@ void loop() {
   updateButton();
   updateBuzzer();
 
-  // 3-Second Booting Phase
-  if (uiState == UI_BOOT) {
-    if (now - bootStarted >= 3000) {
-      if (readTemperature()) {
-        queueBeep(1);
-        enterRunMode();
-      } else {
-        enterFault(); 
-      }
-    }
-  }
-
-  // Temperature Polling Interval (250ms)
-  if (uiState != UI_BOOT && uiState != UI_FAULT && (now - lastTempRead >= 250)) {
+  // Temperature Polling Interval (250ms) - Used for Boot and Run
+  if (uiState != UI_FAULT && (now - lastTempRead >= 250)) {
     lastTempRead = now;
-    if (!readTemperature()) enterFault();
+
+    if (uiState == UI_BOOT) {
+      // Start checking the temperature after 3 seconds
+      if (now - bootStarted >= 3000) {
+        if (readTemperature()) {
+          queueBeep(1);
+          enterRunMode();
+        } else if (now - bootStarted >= 4500) {
+          // If failures persist for up to 4.5 seconds, then execute FAULT.
+          enterFault(); 
+        }
+      }
+    } else {
+      // During normal RUN mode, monitor continuously
+      if (!readTemperature()) enterFault();
+    }
   }
 
   // System State Handler

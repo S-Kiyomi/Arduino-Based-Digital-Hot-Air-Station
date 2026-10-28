@@ -61,6 +61,7 @@ void hardwareInit() {
 
   pinMode(MAX_CS, OUTPUT); digitalWrite(MAX_CS, HIGH);
   pinMode(MAX_SCK, OUTPUT); digitalWrite(MAX_SCK, LOW);
+  
   pinMode(MAX_SO, INPUT);
 
   pinMode(ZERO_CROSS_PIN, INPUT_PULLUP);
@@ -147,7 +148,7 @@ bool readTemperature() {
     currentTempC = NAN; sensorOK = false; return false;
   }
   float t = (float)((raw >> 3) & 0x0FFF) * 0.25f;
-  if (!isfinite(t) || t < 0.0f || t > 1024.0f) {
+  if (!isfinite(t) || t < 5.0f || t > 1024.0f) {
     currentTempC = NAN; sensorOK = false; return false;
   }
   currentTempC = t; sensorOK = true; return true;
