@@ -18,8 +18,9 @@ const uint8_t ZERO_CROSS_PIN    = 2;
 
 // --- SYSTEM CONFIGURATION ---
 const uint8_t LCD_ADDRESS = 0x27;
-// HIGH = Handle up (Sleep), LOW = Handle down (Work)
-const bool HANDLE_ON_HOLDER_LEVEL = HIGH; 
+// HIGH = Handle up (Sleep), LOW = Handle down (Work) [tilt sensor version]
+// HIGH = Handle in the Holder (work), LOW Handle outside the Holder (Sleep) [magnetic sensor version]
+const bool HANDLE_ON_HOLDER_LEVEL = LOW; 
 const int MIN_TEMP_C = 100;
 const int MAX_TEMP_C = 500;
 const int MIN_FAN_PERCENT = 20;
