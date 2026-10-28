@@ -11,7 +11,7 @@ Kesalahan dalam perakitan dapat menyebabkan kerusakan perangkat, kebakaran, atau
 ## Fitur Utama
 
 * **Sistem PID & Triac Control:** Memanaskan elemen secara halus dan mempertahankan target suhu dengan presisi menggunakan deteksi *Zero-Crossing*.
-* **Auto-Sleep & Pendinginan Otomatis (Cooldown):** Menggunakan *tilt sensor* internal pada gagang 858D. Saat gagang diarahkan ke atas, pemanas otomatis mati, namun kipas tetap berputar penuh hingga suhu turun ke level aman (< 100°C) untuk mencegah gagang meleleh.
+* **Auto-Sleep & Pendinginan Otomatis (Cooldown):** Menggunakan *tilt / magnetic sensor* internal pada gagang 858D. Saat gagang diarahkan ke atas / disimpan ke holder, pemanas otomatis mati, namun kipas tetap berputar penuh hingga suhu turun ke level aman (< 100°C) untuk mencegah gagang meleleh.
 * **Antarmuka Rotary Encoder Dinamis:** Putar pelan untuk menyesuaikan nilai secara presisi (1 digit), atau putar cepat untuk melompat dalam kelipatan besar (5 atau 10 digit).
 * **Sistem Failsafe & Deteksi Malfungsi:** Otomatis memutus arus pemanas dan membunyikan alarm jika sensor termokopel tercabut, rusak, atau suhu membaca nilai tidak wajar.
 * **Manajemen Daya Layar:** Lampu latar (*backlight*) LCD otomatis mati setelah 60 detik tanpa aktivitas, dan menyala kembali hanya dengan menekan *knob*.
@@ -22,12 +22,12 @@ Kesalahan dalam perakitan dapat menyebabkan kerusakan perangkat, kebakaran, atau
 
 Untuk merakit stasiun solder uap ini, Anda membutuhkan komponen berikut:
 1. **Mikrokontroler:** Arduino Uno R3
-2. **Gagang Blower:** 858D Hot Air Handle (Versi dengan *Tilt Sensor* / Bola Gravitasi, bukan *Reed Switch* magnetik).
+2. **Gagang Blower:** 858D Hot Air Handle (Versi dengan *Tilt Sensor* / Bola Gravitasi, atau *Reed Switch* magnetik).
 3. **Sensor Suhu:** Modul MAX6675 (Thermocouple Type-K Amplifier).
 4. **Layar:** LCD 16x2 dengan Modul I2C.
 5. **Input:** Modul Rotary Encoder (KY-040).
 6. **Sirkuit Pemanas (AC):** TRIAC (misal: BTA16) & Optocoupler dengan deteksi *Zero-Cross* (misal: MOC3041/MOC3021).
-7. **Sirkuit Kipas (DC):** MOSFET N-Channel (misal: IRFZ44N) dan *Power Supply* 24V DC untuk kipas internal gagang.
+7. **Sirkuit Kipas (DC):** MOSFET N-Channel (misal: IRLZ44N) dan *Power Supply* 24V DC untuk kipas internal gagang.
 8. **Lainnya:** Active Buzzer (5V) dan modul *Zero-Crossing Detector* AC ke DC.
 
 ---
@@ -40,7 +40,7 @@ Berikut adalah pemetaan pin (*pinout*) berdasarkan konfigurasi *firmware* bawaan
 | :--- | :--- | :--- |
 | **Buzzer** | `D6` | Output (Active Buzzer) |
 | **TRIAC (Heater)** | `D7` | Output (via Optocoupler) |
-| **Tilt Sensor** | `D8` | Input Pullup (Deteksi kemiringan gagang) |
+| **Tilt / Magnetic Sensor** | `D8` | Input Pullup (Deteksi kemiringan gagang) |
 | **Kipas Blower** | `D9` | Output PWM (via MOSFET ke kipas 24V) |
 | **Encoder SW** | `D3` | Tombol (Input Pullup) |
 | **Encoder DT** | `D4` | Input Pullup |
@@ -59,7 +59,7 @@ Berikut adalah pemetaan pin (*pinout*) berdasarkan konfigurasi *firmware* bawaan
 
 1. **Pembacaan Suhu:** Modul MAX6675 membaca tegangan sangat kecil dari termokopel di dalam gagang 858D, mengubahnya menjadi data digital, dan mengirimkannya ke Arduino via protokol SPI.
 2. **Kontrol Daya Pemanas:** Untuk mengatur panas elemen 220V, Arduino menunggu sinyal *Interrupt* dari pin *Zero-Cross* (saat gelombang AC berada di titik nol volt). Berdasarkan kalkulasi PID, Timer internal Arduino akan menunda tembakan pulsa ke gerbang TRIAC (*phase-angle control*). Semakin cepat TRIAC dipicu setelah titik nol, semakin panas elemen tersebut].
-3. **Logika Orientasi Gagang:** Ketika gagang diletakkan mendongak ke atas, *tilt sensor* internal memutus sirkuit (terbaca *HIGH* oleh pin *Pull-Up* Arduino). Sistem langsung memotong sinyal gerbang TRIAC ke pemanas, lalu memerintahkan MOSFET untuk menyalakan kipas 24V pada siklus kerja 100% (*PWM 255*) hingga MAX6675 membaca suhu aman di bawah 100°C.
+3. **Logika Orientasi Gagang:** Ketika gagang diletakkan mendongak ke atas, *tilt / magnetic sensor* internal memutus sirkuit (terbaca *HIGH* oleh pin *Pull-Up* Arduino). Sistem langsung memotong sinyal gerbang TRIAC ke pemanas, lalu memerintahkan MOSFET untuk menyalakan kipas 24V pada siklus kerja 100% (*PWM 255*) hingga MAX6675 membaca suhu aman di bawah 100°C.
 
 ---
 
