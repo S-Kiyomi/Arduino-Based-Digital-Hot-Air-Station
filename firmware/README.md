@@ -10,7 +10,7 @@ The firmware has been refactored into a clean, modular C++ architecture to separ
 
 The codebase is divided into the following modules to prevent logic tangling:
 
-* **main.ino**: The core application loop. It handles the high-level state machine, automated cooling logic, and the PID control loop for the heater.
+* **firmware.ino**: The core application loop. It handles the high-level state machine, automated cooling logic, and the PID control loop for the heater.
 
 * **Config.h**: The centralized configuration header. It contains all pin mappings, system constants (such as PID parameters, hardware limits, and timeouts), and global state variables.
 
