@@ -43,7 +43,7 @@ Untuk merakit stasiun solder uap ini, Anda membutuhkan komponen berikut:
 | **Encoder DT** | `D4` | Input Pullup |
 | **Encoder CLK** | `D5` | Input Pullup |
 | **MAX6675 CS** | `D10` | Chip Select |
-| **MAX6675 SO** | `D11` | MISO / Data Out |
+| **MAX6675 SO** | `D12` | MISO / Data Out |
 | **MAX6675 SCK**| `D13` | Serial Clock |
 | **Zero Cross** | `D2` | Interrupt Pin (Deteksi fase AC) |
 | **LCD 16x2** | `SDA / SCL` | Alamat default `0x27` (I2C) |
@@ -55,7 +55,7 @@ Untuk merakit stasiun solder uap ini, Anda membutuhkan komponen berikut:
 ## Cara Kerja Rangkaian
 
 1. **Pembacaan Suhu:** Modul MAX6675 membaca tegangan sangat kecil dari termokopel di dalam gagang 858D, mengubahnya menjadi data digital, dan mengirimkannya ke Arduino via protokol SPI.
-2. **Kontrol Daya Pemanas:** Untuk mengatur panas elemen 220V, Arduino menunggu sinyal *Interrupt* dari pin *Zero-Cross* (saat gelombang AC berada di titik nol volt). Berdasarkan kalkulasi PID, Timer internal Arduino akan menunda tembakan pulsa ke gerbang TRIAC (*phase-angle control*). Semakin cepat TRIAC dipicu setelah titik nol, semakin panas elemen tersebut].
+2. **Kontrol Daya Pemanas:** Untuk mengatur panas elemen 220V, Arduino menunggu sinyal *Interrupt* dari pin *Zero-Cross* (saat gelombang AC berada di titik nol volt). Berdasarkan kalkulasi PID, Timer internal Arduino akan menunda tembakan pulsa ke gerbang TRIAC (*phase-angle control*). Semakin cepat TRIAC dipicu setelah titik nol, semakin panas elemen tersebut.
 3. **Logika Orientasi Gagang:** Ketika gagang diletakkan mendongak ke atas, *tilt / magnetic sensor* internal memutus sirkuit (terbaca *HIGH* oleh pin *Pull-Up* Arduino). Sistem langsung memotong sinyal gerbang TRIAC ke pemanas, lalu memerintahkan MOSFET untuk menyalakan kipas 24V pada siklus kerja 100% (*PWM 255*) hingga MAX6675 membaca suhu aman di bawah 100°C.
 
 ---

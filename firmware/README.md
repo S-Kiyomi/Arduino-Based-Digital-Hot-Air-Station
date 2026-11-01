@@ -1,58 +1,56 @@
-# 858D Hot-Air Station Modular Firmware
+# Shinonome-VORSA 858D Hot-Air Station Bare-Metal Firmware (v2.0)
 
 ## Overview
 
-This directory contains the modular firmware for the Arduino-Based Digital Hot-Air Station. It is specifically designed to control an 858D hot-air rework handle equipped with a tilt sensor (gravity switch) to determine its operational state.
+This directory contains the high-performance **Bare-Metal Firmware (v2.0)** for the Arduino/ATmega328P-Based Digital Hot-Air Station (Shinonome-VORSA). It is specifically tailored for controlling an 858D hot-air rework handle equipped with a tilt/magnetic switch and MAX6675 thermocouple sensing.
 
-The firmware has been refactored into a clean, modular C++ architecture to separate hardware control, user interface rendering, and core system logic. This ensures easier maintenance, high responsiveness, and strict adherence to hardware safety standards.
+The codebase has been refactored from higher-level Arduino abstractions into pure AVR bare-metal C/C++. By eliminating standard Arduino cores (`digitalRead`, `digitalWrite`, `analogWrite`, `Wire.h`, `EEPROM.h`, `LiquidCrystal_I2C.h`), the firmware achieves near-zero memory overhead, ultra-fast interrupt latency, extremely small flash consumption, and persistent configuration persistence.
 
-## Firmware Architecture
+## Architectural Highlights & Bare-Metal Enhancements
 
-The codebase is divided into the following modules to prevent logic tangling:
+The firmware strictly bypasses hardware abstraction layers (HAL) to interact directly with ATmega328P registers:
 
-* **firmware.ino**: The core application loop. It handles the high-level state machine, automated cooling logic, and the PID control loop for the heater.
+- **Bare-Metal TWI/I2C Engine**: Replaces `Wire.h` and `LiquidCrystal_I2C.h`. Uses raw `TWCR`, `TWDR`, and `TWBR` registers for direct 100kHz I2C protocol communication with the PCF8574 LCD backpack.
+- **Hardware SPI (MAX6675)**: SPI communication is handled via raw `SPDR` register transfers instead of software bit-banging, optimizing temperature polling efficiency.
+- **PROGMEM & Memory Optimization**: All static UI strings are retained in Flash ROM using `PROGMEM` and `pgm_read_byte`. Custom lightweight integer formatters replace heavy `snprintf` routines to save over 2KB of flash and minimize SRAM usage.
+- **Persistent EEPROM Storage**: Direct AVR register access (`EEAR`, `EEDR`, `EECR`) provides non-volatile saving for `targetTempC` and `fanPercent` settings upon UI confirmation.
+- **Hardware Fast PWM & Timers**: Kipas dikendalikan langsung oleh Timer1 Fast PWM (`OCR1A` on PB1), SysTick waktu berbasis Timer0 register, serta kontrol fasa TRIAC presisi berbasis Timer2 CTC interrupt.
 
-* **Config.h**: The centralized configuration header. It contains all pin mappings, system constants (such as PID parameters, hardware limits, and timeouts), and global state variables.
+## Directory Structure
 
-* **Hardware.h & Hardware.cpp**: The hardware abstraction layer. This module encapsulates TRIAC firing via Timer2 interrupts, zero-crossing detection, custom MAX6675 thermocouple bit-banging, rotary encoder polling, and buzzer management.
-
-* **UI.h & UI.cpp**: The User Interface module. It handles the 16x2 I2C LCD rendering, menu navigation (Set Temp, Set Fan, Confirmation dialogs), and UI state transitions.
+- **firmware.ino**: Main entry point containing initialization, PID heat control loop, sleep logic, and high-level polling timers.
+- **Config.h**: Centralized hardware pin mapping (AVR Port definitions), system parameters, PID gains, and EEPROM addresses.
+- **Hardware.h & Hardware.cpp**: Hardware abstraction module operating directly on AVR registers. Handles INT0 Zero-Cross interrupts, Timer2 TRIAC gate pulse generation, Hardware SPI, PWM Timer1, SysTick Timer0, and bare-metal EEPROM read/write.
+- **UI.h & UI.cpp**: Bare-metal TWI/I2C LCD driver, custom string formatting, PROGMEM text rendering, and state-machine menu navigation.
 
 ## Key Features
 
-1. **Tilt Sensor Integration**: Detects the handle orientation. Facing down (LOW) tells the system the tool is in use; facing up (HIGH) triggers the sleep sequence.
+1. **Bare-Metal Performance**: Drastically reduced flash binary footprint and SRAM usage with instant response times.
+2. **Handle State Detection**: Monitors the handle switch (PB0 / D8) to instantly transition between active heating (`HEAT`) and auto-cooldown (`SLEEP`).
+3. **Automated Cooldown Safety**: Instantly cuts off TRIAC power upon sleep, forcing blower fan PWM to 100% until nozzle temperature drops below 100°C.
+4. **Zero-Cross TRIAC Phase Control**: Synchronized AC zero-crossing via external interrupt INT0 (PD2) combined with Timer2 CTC for phase-angle delay heating control.
+5. **Non-Volatile Configuration**: Automatic bare-metal EEPROM auto-save when confirming new temperature or fan settings.
+6. **Strict Hardware Failsafe**: Continuous health checking of MAX6675 open-thermocouple status and zero-cross AC synchronization pulse presence. Enters `MALFUNCTION` mode immediately on fault.
 
-2. **Automated Cooldown**: When entering sleep mode, the TRIAC is immediately disabled to cut off the heater, but the blower fan is forced to maximum speed until the internal nozzle temperature drops below 100 degrees Celsius to prevent the plastic handle from melting.
+## Hardware Pin Mapping (ATmega328P Register Reference)
 
-3. **Proportional Heater Control**: Utilizes zero-crossing detection and phase-angle delay control via a TRIAC to smoothly regulate the 220V AC heater element.
+- **Heater Control**: `PD7` / D7 (TRIAC Gate), `PD2` / D2 (Zero-Cross INT0)
+- **Fan PWM Control**: `PB1` / D9 (Timer1 OC1A PWM Output)
+- **Thermocouple Sensor (MAX6675 Hardware SPI)**: `PB2` / D10 (CS), `PB4` / D12 (MISO/SO), `PB5` / D13 (SCK)
+- **User Interface Inputs**: `PD3` / D3 (Encoder SW), `PD4` / D4 (Encoder DT), `PD5` / D5 (Encoder CLK), `PB0` / D8 (Handle Sensor Input)
+- **System Outputs**: `PD6` / D6 (Buzzer)
+- **Display I2C Interface**: `PC4` / A4 (SDA), `PC5` / A5 (SCL)
 
-4. **Dynamic Encoder Navigation**: The rotary encoder logic supports acceleration (fast turning automatically increases step sizes for quick adjustments) and features an auto-sleep timeout for the LCD backlight to save power.
+## External Dependencies
 
-5. **Strict Safety Fault Detection**: Constantly monitors the MAX6675 thermocouple and the AC zero-crossing signal. If the temperature sensor is disconnected or the AC synchronization pulse is lost, the system instantly halts all heating operations and throws a "MALFUNCTION" alarm.
+- **None**. The firmware is 100% self-contained and operates purely on native `<avr/io.h>`, `<avr/interrupt.h>`, and `<avr/pgmspace.h>` headers included with the AVR-GCC toolchain.
 
-## Pin Mapping Reference
+---
 
-* **Heater Control**: D7 (TRIAC Gate), D2 (Zero-Cross Input)
+## Changelog / Recent Updates (v2.0 Refactor)
 
-* **Fan Control**: D9 (PWM Output)
-
-* **Sensors**: D8 (Tilt Switch Input), D10 (MAX6675 CS), D11 (MAX6675 SO), D13 (MAX6675 SCK)
-
-* **User Input**: D3 (Encoder Push Button), D4 (Encoder DT), D5 (Encoder CLK)
-
-* **Output**: D6 (Buzzer), I2C Pins A4/SDA & A5/SCL (LCD)
-
-## Dependencies
-
-* `Wire.h` (Arduino Built-in)
-
-* `LiquidCrystal_I2C.h` (External library required for the 16x2 LCD display)
-
-* Note: The MAX6675 is read using direct pin manipulation (bit-banging) to avoid blocking delays present in standard external libraries.
-
-
-## Changelog / Recent Updates
-
-### Bug Fixes & Improvements
-* **Display Power Management (`UI.cpp`)**: Fixed a bug where the LCD backlight would remain on indefinitely. The `refreshLCD()` function now correctly issues hardware-level commands to turn off the I2C LCD backlight after the configured 60-second inactivity timeout.
-* **Failsafe Disconnect Detection (`Hardware.cpp`)**: Improved the MAX6675 thermocouple reading logic. The `MAX_SO` pin now utilizes the internal pull-up resistor (`INPUT_PULLUP`), and a strict `< 5.0°C` threshold was added to `readTemperature()`. This ensures the system immediately enters the **MALFUNCTION** state and cuts off the heater if the 858D handle is completely detached or if the connection lines fail.
+### Bare-Metal Migration & Performance Overhaul
+- **Removed Arduino Core Dependencies**: Eliminated `Wire.h`, `LiquidCrystal_I2C.h`, `EEPROM.h`, `pinMode()`, `digitalRead()`, `digitalWrite()`, and `analogWrite()`.
+- **Direct Register Driver Implementation**: Implemented bare-metal TWI driver, hardware SPI for MAX6675, Fast PWM Timer1 for fan speed, and register-level EEPROM handlers.
+- **SRAM & Flash Savings**: Migrated all UI strings to `PROGMEM` and replaced `snprintf` with custom lightweight integer formatters, drastically reducing binary size.
+- **EEPROM Auto-Save**: Integrated bare-metal EEPROM word reading/writing to preserve user setpoints (`targetTempC` and `fanPercent`) across reboots.
