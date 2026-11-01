@@ -1,5 +1,6 @@
 #ifndef UI_H
 #define UI_H
+
 #include "Config.h"
 
 void uiInit();

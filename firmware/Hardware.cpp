@@ -2,7 +2,6 @@
 #include "UI.h" 
 #include <avr/interrupt.h>
 
-// --- LOCAL HARDWARE VARIABLES ---
 static uint8_t beepRemaining = 0;
 static bool buzzerOn = false;
 static unsigned long buzzerChangedAt = 0;
@@ -24,7 +23,7 @@ static bool buttonStable = HIGH;
 static bool buttonLastRead = HIGH;
 static bool buttonPressedEvent = false;
 
-// --- INTERRUPT SERVICE ROUTINES (ISR) ---
+// --- ISR ZERO CROSSING ---
 void zeroCrossISR() {
   PORTD &= ~_BV(PD7); 
   zcTicks = 0;
@@ -34,6 +33,7 @@ void zeroCrossISR() {
   lastZeroCrossMicros = micros();
 }
 
+// --- ISR TIMER2 (TRIAC TRIGGER) ---
 ISR(TIMER2_COMPA_vect) {
   if (!triacAllowed || !zcSeen) {
     PORTD &= ~_BV(PD7);
@@ -48,12 +48,20 @@ ISR(TIMER2_COMPA_vect) {
   if (zcTicks < 100) zcTicks++;
   if (!triacFiredThisHalfCycle && zcTicks >= triacDelayTicks) {
     PORTD |= _BV(PD7);
-    gateTicksRemaining = 1; // Gate pulse
+    gateTicksRemaining = 1;
     triacFiredThisHalfCycle = true;
   }
 }
 
-// --- MAIN HARDWARE FUNCTIONS ---
+// Safe atomic read for Zero Cross Status
+bool isZeroCrossHealthy() {
+  unsigned long lastZC;
+  noInterrupts();
+  lastZC = lastZeroCrossMicros;
+  interrupts();
+  return (lastZC != 0UL) && ((micros() - lastZC) < 30000UL);
+}
+
 void hardwareInit() {
   pinMode(BUZZER_PIN, OUTPUT); digitalWrite(BUZZER_PIN, LOW);
   pinMode(TRIAC_PIN, OUTPUT); digitalWrite(TRIAC_PIN, LOW);
@@ -61,8 +69,7 @@ void hardwareInit() {
 
   pinMode(MAX_CS, OUTPUT); digitalWrite(MAX_CS, HIGH);
   pinMode(MAX_SCK, OUTPUT); digitalWrite(MAX_SCK, LOW);
-  
-  pinMode(MAX_SO, INPUT);
+  pinMode(MAX_SO, INPUT); 
 
   pinMode(ZERO_CROSS_PIN, INPUT_PULLUP);
   pinMode(HANDLE_SWITCH_PIN, INPUT_PULLUP);
@@ -72,7 +79,6 @@ void hardwareInit() {
 
   previousEncoderAB = (digitalRead(ENC_CLK) << 1) | digitalRead(ENC_DT);
   
-  // Setup Interrupt
   attachInterrupt(digitalPinToInterrupt(ZERO_CROSS_PIN), zeroCrossISR, FALLING);
   cli();
   TCCR2A = _BV(WGM21);
@@ -144,11 +150,13 @@ bool readTemperature() {
   }
   digitalWrite(MAX_CS, HIGH);
 
-  if (raw & 0x0004) { // Sensor disconnected
+  // Bit D2 MAX6675 = Thermocouple Open/Disconnected
+  if (raw & 0x0004) { 
     currentTempC = NAN; sensorOK = false; return false;
   }
+  
   float t = (float)((raw >> 3) & 0x0FFF) * 0.25f;
-  if (!isfinite(t) || t < 5.0f || t > 1024.0f) {
+  if (!isfinite(t) || t < 1.0f || t > 1024.0f) {
     currentTempC = NAN; sensorOK = false; return false;
   }
   currentTempC = t; sensorOK = true; return true;
@@ -211,6 +219,6 @@ void updateButton() {
   }
   if (buttonPressedEvent) {
     buttonPressedEvent = false;
-    onEncoderButton(); // Call function in UI.cpp
+    onEncoderButton(); 
   }
 }

@@ -1,6 +1,9 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
+
 #include "Config.h"
+
+extern volatile unsigned long lastZeroCrossMicros;
 
 void hardwareInit();
 void heaterOff();
@@ -11,5 +14,6 @@ bool handleIsOnHolder();
 bool readTemperature();
 void updateEncoder();
 void updateButton();
+bool isZeroCrossHealthy();
 
 #endif

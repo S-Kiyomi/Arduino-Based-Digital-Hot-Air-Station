@@ -1,6 +1,3 @@
-
-// The text on the display is in Indonesian.
-
 #include "UI.h"
 #include "Hardware.h" 
 #include <LiquidCrystal_I2C.h>
@@ -18,15 +15,15 @@ void uiInit() {
   lcd.init();
   lcd.backlight();
   backlightOn = true;
-  lcdPrintPadded(0, 0, "system loading");
-  lcdPrintPadded(0, 1, "");
+  lcdPrintPadded(0, 0, "Shinonome-VORSA");
+  lcdPrintPadded(0, 1, "system loading..");
 }
 
 void enterFault() {
   heaterOff();
   sensorOK = false;
   uiState = UI_FAULT;
-  if(!backlightOn) { lcd.backlight(); backlightOn = true; }
+  if (!backlightOn) { lcd.backlight(); backlightOn = true; }
   queueBeep(3);
   lcdNeedsRefresh = true;
 }
@@ -41,8 +38,11 @@ void enterRunMode() {
 void onEncoderButton() {
   lastActivity = millis();
   
-  if (!backlightOn) { // Wake up from dimmed screen
-    lcd.backlight(); backlightOn = true; lcdNeedsRefresh = true; return; 
+  if (!backlightOn) { 
+    lcd.backlight(); 
+    backlightOn = true; 
+    lcdNeedsRefresh = true; 
+    return; 
   }
 
   switch (uiState) {
@@ -58,7 +58,7 @@ void onEncoderButton() {
         savedTargetTempC = targetTempC;
         savedFanPercent = fanPercent;
       } else {
-        targetTempC = savedTargetTempC; // Cancel, rollback values
+        targetTempC = savedTargetTempC; 
         fanPercent = savedFanPercent;
       }
       enterRunMode();
@@ -69,24 +69,21 @@ void onEncoderButton() {
 }
 
 void refreshLCD() {
-  // ---- display bugfix
   static bool currentLcdState = true;
   if (backlightOn != currentLcdState) {
-    if (backlightOn) lcd.backlight();
-    else {
+    if (backlightOn) {
+      lcd.backlight();
+    } else {
       lcd.noBacklight();
-      // lcd.clear(); // Optional: clear text when the screen is off
     }
     currentLcdState = backlightOn;
   }
-  
-  if (!backlightOn) return;
-  char line1[17], line2[17];
 
+  char line1[17], line2[17];
   switch (uiState) {
     case UI_BOOT:
-      lcdPrintPadded(0, 0, "system loading");
-      lcdPrintPadded(0, 1, "");
+      lcdPrintPadded(0, 0, "Shinonome-VORSA");
+      lcdPrintPadded(0, 1, "system loading..");
       break;
     case UI_FAULT:
       lcdPrintPadded(0, 0, "MALFUNCTION!!");

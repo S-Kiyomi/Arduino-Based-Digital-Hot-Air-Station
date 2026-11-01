@@ -12,28 +12,34 @@ const uint8_t ENC_SW            = 3;
 const uint8_t ENC_DT            = 4;
 const uint8_t ENC_CLK           = 5;
 const uint8_t MAX_CS            = 10;
-const uint8_t MAX_SO            = 12; // fix mismatch pin
+const uint8_t MAX_SO            = 12;
 const uint8_t MAX_SCK           = 13;
 const uint8_t ZERO_CROSS_PIN    = 2;
 
 // --- SYSTEM CONFIGURATION ---
-const uint8_t LCD_ADDRESS = 0x27;
-// HIGH = Handle up (Sleep), LOW = Handle down (Work) [tilt sensor version]
-// HIGH = Handle in the Holder (work), LOW Handle outside the Holder (Sleep) [magnetic sensor version]
-const bool HANDLE_ON_HOLDER_LEVEL = LOW; 
+const uint8_t LCD_ADDRESS = 0x27; 
+const bool HANDLE_ON_HOLDER_LEVEL = LOW; // HIGH = Tilt Sensor Open 
+
 const int MIN_TEMP_C = 100;
 const int MAX_TEMP_C = 500;
 const int MIN_FAN_PERCENT = 20;
 const int MAX_FAN_PERCENT = 100;
-const float READY_BAND_C = 5.0;
+
+const float READY_BAND_C = 5.0f;
 const unsigned long BACKLIGHT_TIMEOUT_MS = 60000;
 const unsigned long READY_STABLE_MS = 2000;
+
+// --- PID PARAMETERS ---
+const float HEATER_KP = 2.0f;
+const float HEATER_KI = 0.5f;
+const float HEATER_KD = 1.0f;
+const float PID_ACTIVE_BAND_C = 30.0f;
+const float PID_INTEGRAL_MAX = 100.0f;
 
 // --- MACHINE STATE ---
 enum UiState : uint8_t { UI_BOOT, UI_FAULT, UI_SET_TEMP, UI_SET_FAN, UI_CONFIRM, UI_RUN };
 
-// --- GLOBAL VARIABLES (EXTERN) ---
-// Only declared here, initialized in the main file (.ino)
+// --- GLOBAL VARIABLES DECLARATION (EXTERN) ---
 extern UiState uiState;
 extern float currentTempC;
 extern int targetTempC;
@@ -41,6 +47,7 @@ extern int savedTargetTempC;
 extern int fanPercent;
 extern int savedFanPercent;
 extern int heaterDemand;
+
 extern bool sensorOK;
 extern bool sleeping;
 extern bool backlightOn;
