@@ -48,6 +48,7 @@ extern bool sleeping;
 extern bool backlightOn;
 extern bool confirmYes;
 extern bool lcdNeedsRefresh;
+extern uint32_t lastActivity;
 extern volatile uint32_t systemMillis;
 extern volatile uint32_t lastZeroCrossMicros;
 
