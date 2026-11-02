@@ -4,7 +4,7 @@
 [![Platform: ATmega328P](https://img.shields.io/badge/MCU-ATmega328P%20%2F%20Arduino%20Uno-blue.svg)](https://www.microchip.com/)
 [![Architecture: AVR Bare-Metal](https://img.shields.io/badge/Architecture-Pure%20Bare--Metal-red.svg)]()
 
-> *Baca dalam bahasa lain: [English](../../README.md)*
+> *Baca dalam bahasa lain: [English](/README.md)*
 
 Solder uap atau *hot air rework station* digital berbasis mikrokontroler **ATmega328P (Arduino Uno R3)** ini adalah proyek rakitan/DIY sumber terbuka (*open-source*) yang dirancang untuk memberikan kontrol suhu dan aliran udara presisi tinggi. Proyek ini menggunakan gagang blower 858D standar, sensor Thermocouple Type-K (MAX6675), serta *rotary encoder* untuk antarmuka pengguna yang intuitif.
 
