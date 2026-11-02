@@ -1,39 +1,41 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <Arduino.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <math.h>
 
-// --- PIN MAP ---
-const uint8_t BUZZER_PIN        = 6;
-const uint8_t TRIAC_PIN         = 7;
-const uint8_t HANDLE_SWITCH_PIN = 8;
-const uint8_t FAN_PIN           = 9;
-const uint8_t ENC_SW            = 3;
-const uint8_t ENC_DT            = 4;
-const uint8_t ENC_CLK           = 5;
-const uint8_t MAX_CS            = 10;
-const uint8_t MAX_SO            = 12; // fix mismatch pin
-const uint8_t MAX_SCK           = 13;
-const uint8_t ZERO_CROSS_PIN    = 2;
+// --- EEPROM ADDRESSES ---
+#define EEPROM_ADDR_MAGIC     0x00
+#define EEPROM_ADDR_TARGET_C  0x02
+#define EEPROM_ADDR_FAN_PCT   0x04
+#define EEPROM_MAGIC_VALUE    0x5A3C
 
 // --- SYSTEM CONFIGURATION ---
-const uint8_t LCD_ADDRESS = 0x27;
-// HIGH = Handle up (Sleep), LOW = Handle down (Work) [tilt sensor version]
-// HIGH = Handle in the Holder (work), LOW Handle outside the Holder (Sleep) [magnetic sensor version]
-const bool HANDLE_ON_HOLDER_LEVEL = LOW; 
+#define LCD_ADDR 0x27
+
+const bool HANDLE_ON_HOLDER_LEVEL = 0; // LOW = Handle in Holder (Sleep)
 const int MIN_TEMP_C = 100;
 const int MAX_TEMP_C = 500;
 const int MIN_FAN_PERCENT = 20;
 const int MAX_FAN_PERCENT = 100;
-const float READY_BAND_C = 5.0;
-const unsigned long BACKLIGHT_TIMEOUT_MS = 60000;
-const unsigned long READY_STABLE_MS = 2000;
+const float READY_BAND_C = 5.0f;
+const uint32_t BACKLIGHT_TIMEOUT_MS = 60000;
+const uint32_t READY_STABLE_MS = 2000;
+
+// --- PID TUNING PARAMETERS ---
+const float HEATER_KP = 2.5f;
+const float HEATER_KI = 0.2f;
+const float HEATER_KD = 1.0f;
+const float PID_INTEGRAL_MAX = 200.0f;
+const float PID_ACTIVE_BAND_C = 30.0f;
 
 // --- MACHINE STATE ---
 enum UiState : uint8_t { UI_BOOT, UI_FAULT, UI_SET_TEMP, UI_SET_FAN, UI_CONFIRM, UI_RUN };
 
 // --- GLOBAL VARIABLES (EXTERN) ---
-// Only declared here, initialized in the main file (.ino)
 extern UiState uiState;
 extern float currentTempC;
 extern int targetTempC;
@@ -46,6 +48,8 @@ extern bool sleeping;
 extern bool backlightOn;
 extern bool confirmYes;
 extern bool lcdNeedsRefresh;
-extern unsigned long lastActivity;
+extern uint32_t lastActivity;
+extern volatile uint32_t systemMillis;
+extern volatile uint32_t lastZeroCrossMicros;
 
 #endif
