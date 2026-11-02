@@ -4,7 +4,7 @@
 [![Platform: ATmega328P](https://img.shields.io/badge/MCU-ATmega328P%20%2F%20Arduino%20Uno-blue.svg)](https://www.microchip.com/)
 [![Architecture: AVR Bare-Metal](https://img.shields.io/badge/Architecture-Pure%20Bare--Metal-red.svg)]()
 
-> *Read this in other languages: [Bahasa Indonesia](docs/README_ID.md)*
+> *Read this in other languages: [Bahasa Indonesia](/docs/README_ID.md)*
 
 This **ATmega328P (Arduino Uno R3)** microcontroller-based digital hot-air rework station is an open-source DIY project designed to deliver high-precision temperature control and airflow management. It utilizes a standard 858D hot-air handle, a K-type thermocouple sensor (MAX6675), and a rotary encoder for an intuitive user interface.
 
