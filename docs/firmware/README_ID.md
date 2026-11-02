@@ -1,6 +1,6 @@
 # Shinonome-VORSA 858D Hot-Air Station Bare-Metal Firmware (v2.0)
 
-> *Baca dalam bahasa lain: [English](../../firmware/README.md)*
+> *Baca dalam bahasa lain: [English](/firmware/README.md)*
 
 ## Overview
 
