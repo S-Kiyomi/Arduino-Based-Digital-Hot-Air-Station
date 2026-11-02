@@ -1,68 +1,65 @@
-# Open-Source DIY Hot-Air Rework Station (858D)
+# Shinonome-VORSA Open-Source 858D Digital Hot-Air Rework Station (v2.0)
 
-Solder uap atau *hot air rework station* digital berbasis Arduino Uno R3 ini adalah proyek rakitan/DIY sumber terbuka (open-source) yang dirancang untuk memberikan kontrol suhu dan aliran udara yang presisi. Proyek ini menggunakan gagang blower 858D standar, sensor Thermocouple Type-K (MAX6675), serta *rotary encoder* untuk antarmuka pengguna yang intuitif.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://choosealicense.com/licenses/mit/)
+[![Platform: ATmega328P](https://img.shields.io/badge/MCU-ATmega328P%20%2F%20Arduino%20Uno-blue.svg)](https://www.microchip.com/)
+[![Architecture: AVR Bare-Metal](https://img.shields.io/badge/Architecture-Pure%20Bare--Metal-red.svg)]()
 
-### WARNING!!
-**Proyek ini berurusan dengan tegangan listrik tinggi (220V/230V AC).**
-Kesalahan dalam perakitan dapat menyebabkan kerusakan perangkat, kebakaran, atau **kematian akibat tersengat listrik**. Jangan pernah menyentuh area sirkuit TRIAC/Heater saat sistem terhubung ke sumber listrik PLN. Pastikan sirkuit tegangan tinggi diisolasi secara fisik dan logis dari mikrokontroler. **Lakukan risiko perakitan dengan tanggung jawab Anda sendiri.**
+> *Read this in other languages: [Bahasa Indonesia](docs/README_ID.md)*
 
----
+This **ATmega328P (Arduino Uno R3)** microcontroller-based digital hot-air rework station is an open-source DIY project designed to deliver high-precision temperature control and airflow management. It utilizes a standard 858D hot-air handle, a K-type thermocouple sensor (MAX6675), and a rotary encoder for an intuitive user interface.
 
-## Fitur Utama
+In **v2.0**, the firmware has been completely refactored from the standard Arduino core environment to **Pure AVR Bare-Metal C/C++** to achieve overhead-free execution, lightning-fast response times, and an extremely low memory footprint.
 
-* **Sistem PID & Triac Control:** Memanaskan elemen secara halus dan mempertahankan target suhu dengan presisi menggunakan deteksi *Zero-Crossing*.
-* **Auto-Sleep & Pendinginan Otomatis (Cooldown):** Menggunakan *tilt / magnetic sensor* internal pada gagang 858D. Saat gagang diarahkan ke atas / disimpan ke holder, pemanas otomatis mati, namun kipas tetap berputar penuh hingga suhu turun ke level aman (< 100°C) untuk mencegah gagang meleleh.
-* **Antarmuka Rotary Encoder Dinamis:** Putar pelan untuk menyesuaikan nilai secara presisi (1 digit), atau putar cepat untuk melompat dalam kelipatan besar (5 atau 10 digit).
-* **Sistem Failsafe & Deteksi Malfungsi:** Otomatis memutus arus pemanas dan membunyikan alarm jika sensor termokopel tercabut, rusak, atau suhu membaca nilai tidak wajar.
-* **Manajemen Daya Layar:** Lampu latar (*backlight*) LCD otomatis mati setelah 60 detik tanpa aktivitas, dan menyala kembali hanya dengan menekan *knob*.
-
----
-
-## Component Requirements
-
-Untuk merakit stasiun solder uap ini, Anda membutuhkan komponen berikut:
-1. **Mikrokontroler:** Arduino Uno R3
-2. **Gagang Blower:** 858D Hot Air Handle (Versi dengan *Tilt Sensor* / Bola Gravitasi, atau *Reed Switch* magnetik).
-3. **Sensor Suhu:** Modul MAX6675 (Thermocouple Type-K Amplifier).
-4. **Layar:** LCD 16x2 dengan Modul I2C.
-5. **Input:** Modul Rotary Encoder (KY-040).
-6. **Sirkuit Pemanas (AC):** TRIAC (misal: BTA16) & Optocoupler dengan deteksi *Zero-Cross* (misal: MOC3041/MOC3021).
-7. **Sirkuit Kipas (DC):** MOSFET N-Channel (misal: IRLZ44N) dan *Power Supply* 24V DC untuk kipas internal gagang.
-8. **Lainnya:** Active Buzzer (5V) dan modul *Zero-Crossing Detector* AC ke DC.
+> **HIGH VOLTAGE SAFETY WARNING (220V AC)**
+> 
+> This project deals directly with lethal 220V/230V AC mains electricity. Incorrect assembly can lead to hardware destruction, fire hazard, or fatal electric shock.
+> - Never touch any part of the TRIAC/Heater circuitry while the system is connected to mains power.
+> - Ensure high-voltage circuits are physically and optocoupled-isolated from microcontroller lines.
+> - Assemble and operate entirely at your own risk.
 
 ---
 
+## Key Features
 
-| Komponen | Pin / Koneksi ke Arduino | Keterangan |
-| :--- | :--- | :--- |
-| **Buzzer** | `D6` | Output (Active Buzzer) |
-| **TRIAC (Heater)** | `D7` | Output (via Optocoupler) |
-| **Tilt / Magnetic Sensor** | `D8` | Input Pullup (Deteksi kemiringan gagang) |
-| **Kipas Blower** | `D9` | Output PWM (via MOSFET ke kipas 24V) |
-| **Encoder SW** | `D3` | Tombol (Input Pullup) |
-| **Encoder DT** | `D4` | Input Pullup |
-| **Encoder CLK** | `D5` | Input Pullup |
-| **MAX6675 CS** | `D10` | Chip Select |
-| **MAX6675 SO** | `D12` | MISO / Data Out |
-| **MAX6675 SCK**| `D13` | Serial Clock |
-| **Zero Cross** | `D2` | Interrupt Pin (Deteksi fase AC) |
-| **LCD 16x2** | `SDA / SCL` | Alamat default `0x27` (I2C) |
-
-*(Catatan: Skema visual sirkuit lengkap akan segera diunggah ke repositori ini).*
+- **Pure Bare-Metal Firmware (v2.0):** Runs without Arduino library dependencies (`Wire.h`, `LiquidCrystal_I2C.h`, `EEPROM.h`, `pinMode`, `digitalWrite`). Compiled natively via `avr-gcc` and `Makefile`.
+- **Extreme Memory Footprint Optimization:** Extremely lightweight footprint (~6.4 KB Flash & 128 Bytes SRAM). UI text strings are stored in Flash ROM (`PROGMEM`) with custom lightweight integer formatting.
+- **Non-Volatile EEPROM Storage:** Target temperature (`targetTempC`) and fan speed (`fanPercent`) settings are saved automatically to EEPROM upon UI confirmation.
+- **PID Control & TRIAC Phase-Angle Timing:** Smoothly heats the element and precisely maintains temperature using AC Zero-Crossing detection (INT0) and Timer2 CTC interrupt timing.
+- **Auto-Sleep & Automated Cooldown:** When the handle is placed in its cradle, heater power is instantly cut while the blower fan ramps up to 100% PWM until the nozzle drops below 100°C to prevent thermal damage.
+- **Failsafe & Fault Detection:** Instantly cuts power and triggers a *MALFUNCTION* alarm if the thermocouple opens/fails or if the AC Zero-Cross sync pulse is lost.
+- **Display Power Management:** LCD backlight automatically turns off after 60 seconds of inactivity.
 
 ---
 
-## Cara Kerja Rangkaian
+## Component Requirements & Pin Mapping
 
-1. **Pembacaan Suhu:** Modul MAX6675 membaca tegangan sangat kecil dari termokopel di dalam gagang 858D, mengubahnya menjadi data digital, dan mengirimkannya ke Arduino via protokol SPI.
-2. **Kontrol Daya Pemanas:** Untuk mengatur panas elemen 220V, Arduino menunggu sinyal *Interrupt* dari pin *Zero-Cross* (saat gelombang AC berada di titik nol volt). Berdasarkan kalkulasi PID, Timer internal Arduino akan menunda tembakan pulsa ke gerbang TRIAC (*phase-angle control*). Semakin cepat TRIAC dipicu setelah titik nol, semakin panas elemen tersebut.
-3. **Logika Orientasi Gagang:** Ketika gagang diletakkan mendongak ke atas, *tilt / magnetic sensor* internal memutus sirkuit (terbaca *HIGH* oleh pin *Pull-Up* Arduino). Sistem langsung memotong sinyal gerbang TRIAC ke pemanas, lalu memerintahkan MOSFET untuk menyalakan kipas 24V pada siklus kerja 100% (*PWM 255*) hingga MAX6675 membaca suhu aman di bawah 100°C.
+| Component | Arduino Pin | AVR Port/Pin | Register Type / Function |
+| :--- | :--- | :--- | :--- |
+| Zero-Cross Signal | D2 | PD2 | External Interrupt 0 (INT0) |
+| Encoder SW | D3 | PD3 | Digital Input Pull-up |
+| Encoder DT | D4 | PD4 | Digital Input Pull-up |
+| Encoder CLK | D5 | PD5 | Digital Input Pull-up |
+| Buzzer | D6 | PD6 | Digital Output |
+| TRIAC Gate | D7 | PD7 | Digital Output (Timer2 Phase Delay) |
+| Handle Switch | D8 | PB0 | Digital Input Pull-up (Sleep/Work) |
+| Blower Fan PWM | D9 | PB1 | Output Hardware Fast PWM Timer1 (OC1A) |
+| MAX6675 CS | D10 | PB2 | SPI Slave Select (Output) |
+| MAX6675 SO | D12 | PB4 | SPI MISO Input |
+| MAX6675 SCK | D13 | PB5 | SPI Serial Clock Output |
+| LCD 16x2 I2C | A4 / A5 | PC4 / PC5 | Hardware TWI (SDA / SCL) |
+
+---
+
+## Documentation & Firmware Build Guide
+
+For detailed bare-metal architecture, ATmega328P register configuration, and compilation (`make`) and flashing (`avrdude`) instructions, please read the technical documentation:
+
+[Firmware Documentation & Build Guide](firmware/README.md)
 
 ---
 
 ## License
 
-Proyek ini dirilis di bawah lisensi [MIT](https://choosealicense.com/licenses/mit/). 
-Anda bebas menggunakan, memodifikasi, dan mendistribusikan proyek ini baik untuk tujuan komersial maupun non-komersial.
+This project is licensed under the MIT License. You are free to use, modify, and distribute this project for both commercial and non-commercial purposes.
 
 Copyright (c) 2026 Rul Chan & Averyandra. All Rights Reserved.
