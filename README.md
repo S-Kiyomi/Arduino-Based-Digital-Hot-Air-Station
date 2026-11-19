@@ -1,4 +1,4 @@
-# Shinonome-VORSA Open-Source 858D Digital Hot-Air Rework Station (v2.0)
+# 858d HOT AIR REWORK STATION (SVARD858d)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://choosealicense.com/licenses/mit/)
 [![Platform: ATmega328P](https://img.shields.io/badge/MCU-ATmega328P%20%2F%20Arduino%20Uno-blue.svg)](https://www.microchip.com/)
@@ -6,7 +6,7 @@
 
 > *sile bace dalam bahase kamek mun kau daan ngerati inggris: [Bahasa Indonesia](/docs/README_ID.md)*
 
-This **ATmega328P (Arduino Uno R3)** microcontroller-based digital hot-air rework station is an open-source DIY project designed to deliver high-precision temperature control and airflow management. It utilizes a standard 858D hot-air handle, a K-type thermocouple sensor (MAX6675), and a rotary encoder for an intuitive user interface.
+This **ATmega328P** microcontroller-based digital hot-air rework station is an open-source DIY project designed to deliver high(not or maybe)precision temperature control and airflow management. It utilizes a standard 858D hot-air handle, a K-type thermocouple sensor (MAX6675), and a rotary encoder for an intuitive user interface.
 
 In **v2.0**, the firmware has been completely refactored from the standard Arduino core environment to **Pure AVR Bare-Metal C/C++** to achieve overhead-free execution, lightning-fast response times, and an extremely low memory footprint.
 
@@ -16,6 +16,8 @@ In **v2.0**, the firmware has been completely refactored from the standard Ardui
 > - Never touch any part of the TRIAC/Heater circuitry while the system is connected to mains power.
 > - Ensure high-voltage circuits are physically and optocoupled-isolated from microcontroller lines.
 > - Assemble and operate entirely at your own risk.
+> - DO WITH YOUR OWN RISK
+> - MATI TANAM
 
 ---
 
